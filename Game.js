@@ -26,6 +26,14 @@ class Game {
     this.horizontalMovement = 1;
     this.verticalMovement = 0;
     this.lastKeyUp = "";
+    this.swipe = {
+      treshold: Math.max(1, Math.floor(0.01 * window.innerWidth)),
+      touchstartX: 0,
+      touchstartY: 0,
+      touchendX: 0,
+      touchendY: 0,
+      limit: Math.tan(((45 * 1.5) / 180) * Math.PI),
+    };
   }
   updateFood() {
     this.foodCoords.x =
@@ -124,7 +132,7 @@ class Game {
       });
     }
   }
-  listener(e) {
+  keyUpListener(e) {
     const { key } = e;
     if (key !== this.lastKeyUp) {
       this.lastKeyUp = key;
@@ -132,18 +140,54 @@ class Game {
       this.move();
     }
   }
-  bindedListener = this.listener.bind(this);
+  touchStartListener(e) {
+    this.touchstartX = e.changedTouches[0].screenX;
+    this.touchstartY = e.changedTouches[0].screenY;
+  }
+  touchEndListener(e) {
+    this.touchendX = e.changedTouches[0].screenX;
+    this.touchendY = e.changedTouches[0].screenY;
+    let x = this.touchendX - this.touchstartX;
+    let y = this.touchendY - this.touchstartY;
+    let xy = Math.abs(x / y);
+    let yx = Math.abs(y / x);
+    if (
+      Math.abs(x) > this.swipe.treshold ||
+      Math.abs(y) > this.swipe.treshold
+    ) {
+      if (yx <= this.swipe.limit) {
+        if (x < 0) {
+          this.changeMovement("ArrowLeft");
+        } else {
+          this.changeMovement("ArrowRight");
+        }
+      }
+      if (xy <= this.swipe.limit) {
+        if (y < 0) {
+          this.changeMovement("ArrowUp");
+        } else {
+          this.changeMovement("ArrowDown");
+        }
+      }
+    }
+  }
+  bindedKeyUpListener = this.keyUpListener.bind(this);
+  bindedTouchStartListener = this.touchStartListener.bind(this);
+  bindedTouchEndListener = this.touchEndListener.bind(this);
   start() {
     this.gameOver = false;
     this.updateFood();
-    window.addEventListener("keyup", this.bindedListener);
+    window.addEventListener("keyup", this.bindedKeyUpListener);
+    window.addEventListener("touchstart", this.bindedTouchStartListener);
+    window.addEventListener("touchend", this.bindedTouchEndListener);
     const gameInterval = setInterval(() => {
       if (!this.gameOver) this.move();
       else {
         alert("Game over");
         clearInterval(gameInterval);
-        window.removeEventListener("keyup", this.bindedListener);
-        debugger;
+        window.removeEventListener("keyup", this.bindedKeyUpListener);
+        window.removeEventListener("touchstart", this.bindedTouchStartListener);
+        window.removeEventListener("touchend", this.bindedTouchEndListener);
       }
     }, 200);
   }
