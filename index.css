@@ -1,22 +1,60 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   position: fixed;
   top: 0;
   left: 0;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: black;
+  background-color: white;
+  color: #333333;
+  font-family: "Poppins";
+}
+
+.menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.menu__items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  list-style: none;
+}
+
+.menu__item {
+  cursor: pointer;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+}
+
+.statistics {
+  display: none;
+  list-style: none;
+}
+
+.statistics__item {
 }
 
 #canvas {
   width: 30rem;
   height: 30rem;
-  border: 2px solid white;
+  background-color: #c6c6c6;
 }
 
 @media screen and (max-width: 628px) {

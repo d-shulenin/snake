@@ -1,5 +1,5 @@
 class Game {
-  constructor() {
+  constructor({ scoreElement, bestElement, bestScore }) {
     this.canvas = document.getElementById("canvas");
     this.ctx = canvas.getContext("2d");
     this.dimensions = {
@@ -9,9 +9,9 @@ class Game {
       blockHeight: this.canvas.height / 25,
     };
     this.colors = {
-      boardColor: "black",
-      snakeColor: "green",
-      foodColor: "red",
+      boardColor: "#C6C6C6",
+      snakeColor: "#333333",
+      foodColor: "#DE401D",
     };
     this.gameOver = true;
     this.headCoords = {
@@ -23,6 +23,10 @@ class Game {
       x: 0,
       y: 0,
     };
+    this.score = 0;
+    this.scoreElement = scoreElement;
+    this.bestElement = bestElement;
+    this.bestScore = bestScore;
     this.horizontalMovement = 1;
     this.verticalMovement = 0;
     this.lastKeyUp = "";
@@ -53,20 +57,20 @@ class Game {
         if (this.horizontalMovement !== -1) {
           this.horizontalMovement = 1;
           this.verticalMovement = 0;
-          break;
         }
+        break;
       case "ArrowUp":
         if (this.verticalMovement !== 1) {
           this.horizontalMovement = 0;
           this.verticalMovement = -1;
-          break;
         }
+        break;
       case "ArrowDown":
         if (this.verticalMovement !== -1) {
           this.horizontalMovement = 0;
           this.verticalMovement = 1;
-          break;
         }
+        break;
       default:
         break;
     }
@@ -90,6 +94,10 @@ class Game {
       this.foodCoords.x === this.headCoords.x &&
       this.foodCoords.y === this.headCoords.y
     ) {
+      this.scoreElement.innerText = `Score: ${++this.score}`;
+      this.bestElement.innerText = `Best: ${
+        this.score > this.bestScore ? this.score : this.bestScore
+      }`;
       this.body.push({ x: this.foodCoords.x, y: this.foodCoords.y });
       this.updateFood();
     }
@@ -183,6 +191,8 @@ class Game {
     const gameInterval = setInterval(() => {
       if (!this.gameOver) this.move();
       else {
+        if (this.score > this.bestScore)
+          localStorage.setItem("best", this.score);
         alert("Game over");
         clearInterval(gameInterval);
         window.removeEventListener("keyup", this.bindedKeyUpListener);
